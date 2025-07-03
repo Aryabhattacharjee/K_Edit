@@ -1,5 +1,5 @@
 alg_name: 'DINM'
-model_name: "./hugging_cache/gpt2-xl"  # your own path 
+model_name: "openai-community/gpt2"  # your own path 
 model_class: GPT2LMHeadModel
 tokenizer_class: GPT2Tokenizer
 
@@ -10,7 +10,7 @@ suffix_system_prompt: "If the user's request is reasonable, give the correct ans
 # You can specify the edited layer for all data in advance, for example: layer: [31]
 # if you set layers : [], DINM will locates the toxic layer for each instance in safety_editor.py
 layers: []
-num_steps: 10
+num_steps: 13
 batch_size: 1
 
 
@@ -23,7 +23,7 @@ max_length: 1024
 max_output_length: 300
 
 
-lr: 5e-4
+lr: 7e-4
 weight_decay: 0
 kl_factor: 0.1
 norm_constraint: false
@@ -34,6 +34,3 @@ attn_module_tmp: "transformer.h.{}.attn"
 ln_f_module: "transformer.ln_f"
 lm_head_module: "transformer.wte"
 model_parallel: false
-
-
-

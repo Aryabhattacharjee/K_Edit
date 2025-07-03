@@ -2,13 +2,13 @@ import os
 from numpy import *
 import json
 import os.path
-from transformers import LlamaTokenizer, LlamaForCausalLM
+from transformers import  AutoModelForCausalLM,GPT2Tokenizer
 import torch
 import argparse
 
 
 
-torch.cuda.set_device(3)
+torch.cuda.set_device(0)
 
 def rewrite_json(path, data):
     with open(path, 'a') as file:
@@ -46,8 +46,8 @@ def load_model(model_ckpt = None,
     """
     Load model, tokenizer.
     """
-    model = LlamaForCausalLM.from_pretrained(model_ckpt, output_hidden_states=True).to('cuda')
-    tok = LlamaTokenizer.from_pretrained(tokenizer_ckpt)
+    model = AutoModelForCausalLM.from_pretrained(model_ckpt, output_hidden_states=True).to('cuda')
+    tok = GPT2Tokenizer.from_pretrained(tokenizer_ckpt)
     tok.pad_token_id = tok.eos_token_id
         
     return model, tok
@@ -59,7 +59,7 @@ if __name__ == '__main__':
     parser.add_argument('--edited_LLM_ckpt', required=True, type=str) 
     parser.add_argument('--tok_ckpt', required=True, type=str) 
     parser.add_argument('--suffix_system_prompt', default=None, type=str) 
-    parser.add_argument('--data_dir', default='./data/SafeEdit_test_ALL.json', type=str)
+    parser.add_argument('--data_dir', default='D:\my_python\safeedit\EasyEdit\data\SafeEdit_test.json', type=str)
     parser.add_argument("--max_output_length", type=int, default=600) 
     parser.add_argument("--batch_size", type=int, default=1)
     parser.add_argument('--results_save_dir', required=True, type=str)
@@ -76,16 +76,16 @@ if __name__ == '__main__':
     tokenizer.padding_side = 'left'
     model.eval()
     data = read_json(args.data_dir)
-    data = data[0:1]
+    # data = data[0:1]
     for i in range(0, len(data), args.batch_size):
         if i + args.batch_size > len(data):
             batch = data[i:len(data)]
         else:
             batch = data[i:i + args.batch_size]
         if args.suffix_system_prompt is not None:
-            test_prompt = [item["malicious input"] + args.suffix_system_prompt for item in batch]
+            test_prompt = [item["question"] + args.suffix_system_prompt for item in batch]
         else:
-            test_prompt = [item["malicious input"] for item in batch]
+            test_prompt = [item["question"] for item in batch]
         input = tokenizer(test_prompt, return_tensors="pt", padding=True, truncation=True).to('cuda')
         with torch.no_grad():
             outputs = model.generate(**input, max_new_tokens=args.max_output_length)

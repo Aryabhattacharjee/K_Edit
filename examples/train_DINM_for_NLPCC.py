@@ -1,5 +1,5 @@
-import os.path
-# sys.path.append('..')
+import sys
+sys.path.append("D:\my_python\safeedit\EasyEdit")
 import numpy as np
 from easyeditor import (
     DINMHyperParams,
@@ -8,11 +8,8 @@ from easyeditor import SafetyEditor
 from easyeditor import DINMHyperParams
 from easyeditor import SafetyDataset
 import json
-from easyeditor import n_gram_entropy
 
 import argparse
-
-
 
 def read_json(path):
     with open(path, 'r') as f:
@@ -24,7 +21,7 @@ if __name__ == '__main__':
     parser.add_argument('--NLPCC', help='execute the training process for Track 2 of NLPCC', default=True)
     parser.add_argument('--editing_method', default="DINM", type=str)  
     parser.add_argument('--hparams_dir', required=True, type=str)  
-    parser.add_argument('--data_dir', default='./data', type=str)
+    parser.add_argument('--data_dir', default='D:\my_python\safeedit\EasyEdit\data', type=str)
     parser.add_argument('--results_save_dir', required=True, type=str)
 
     args = parser.parse_args()
@@ -39,8 +36,8 @@ if __name__ == '__main__':
     editor = SafetyEditor.from_hparams(hparams)
 
     # we take an example from "three_instances_for_editing.json". You can choose a case that fits your scenario to edit the vanilla model.
-    edit_data_all = SafetyDataset(f'{args.data_dir}/three_instances_for_editing.json')
-    edit_data = [edit_data_all[1],]
+    edit_data_all = SafetyDataset(f'{args.data_dir}/SafeEdit_train.json')
+    edit_data = edit_data_all
 
     case_id = [edit_data_['case_id'] for edit_data_ in edit_data]
     prompts = [edit_data_['prompt'] for edit_data_ in edit_data]
@@ -84,13 +81,3 @@ if __name__ == '__main__':
 
 # DINM edits llama-2-7b-chat
 # python train_DINM_for_NLPCC.py --hparams_dir ./hparams/DINM/llama-7b --results_save_dir ./safety_results
-    
-
-
-
-
-
-
-
-
-    

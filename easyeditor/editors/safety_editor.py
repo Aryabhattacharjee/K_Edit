@@ -167,27 +167,29 @@ class SafetyEditor:
 
         if "NLPCC" in kwargs and kwargs['NLPCC']:
             for i, (request, request_with_systemPrompt) in enumerate(zip(requests, requests_with_systemPrompt)):
-                start = time()
-                if len(self.hparams.layers) == 0:
-                    self.hparams.layers = self._locate_toxic_layer(self.model, self.tok, [request,])
-                edited_model, weights_copy = self.apply_algo(
-                    self.model,
-                    self.tok,
-                    [request_with_systemPrompt],
-                    self.hparams,
-                    copy=False,
-                    return_orig_weights=True,
-                    keep_original_weight=keep_original_weight,
-                    train_ds=kwargs['train_ds'] if self.alg_name == 'IKE' else None
-                )
-                exec_time = time() - start
-                LOG.info(f"Execution {i} editing took {exec_time}")
-                edited_model.save_pretrained(kwargs['ckpt_save_dir'])
-                print(f"edited model is saved in {kwargs['ckpt_save_dir']}")
-                with torch.no_grad():
-                    for k, v in weights_copy.items():
-                        nethook.get_parameter(self.model, k)[...] = v.to(f"cuda:{self.hparams.device}")
-              
+                try:
+                    start = time()
+                    if len(self.hparams.layers) == 0:
+                        self.hparams.layers = self._locate_toxic_layer(self.model, self.tok, [request,])
+                    edited_model, weights_copy = self.apply_algo(
+                        self.model,
+                        self.tok,
+                        [request_with_systemPrompt],
+                        self.hparams,
+                        copy=False,
+                        return_orig_weights=True,
+                        keep_original_weight=keep_original_weight,
+                        train_ds=kwargs['train_ds'] if self.alg_name == 'IKE' else None
+                    )
+                    exec_time = time() - start
+                    LOG.info(f"Execution {i} editing took {exec_time}")
+                    edited_model.save_pretrained(kwargs['ckpt_save_dir'])
+                    print(f"edited model is saved in {kwargs['ckpt_save_dir']}")
+                    with torch.no_grad():
+                        for k, v in weights_copy.items():
+                            nethook.get_parameter(self.model, k)[...] = v.to(f"cuda:{self.hparams.device}")
+                except :
+                    continue
 
         else:
             all_metrics = []

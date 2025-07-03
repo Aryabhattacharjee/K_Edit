@@ -144,7 +144,7 @@ def execute_dinm(
             post_logits = post_logits[:, -kl_mask.size(1):]   #torch.Size([1, 59, 32000])
         l_loc_instruction = kl_loc_loss(instruction_base_Logits.detach(), post_logits, mask=kl_mask) # tensor 一个值 0
         loss = hparams.kl_factor  * l_edit + l_loc_instruction
-        # loss =  l_edit 
+        # loss =  l_edit
         print(f"Batch loss {loss.item()}, loss_edit*0.1:{0.1 * l_edit}, loss_loc_instruction:{l_loc_instruction}")
 
         if loss.item() >= 1e-4:

@@ -1,7 +1,7 @@
 import os
 import os.path
 import sys
-# sys.path.append('..')
+sys.path.append('D:\my_python\safeedit\EasyEdit')
 import numpy as np
 import hydra
 from easyeditor import (
